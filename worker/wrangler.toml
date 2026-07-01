@@ -1,0 +1,7 @@
+name = "makuma-worker"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# MONGODB_URI will be passed via .dev.vars

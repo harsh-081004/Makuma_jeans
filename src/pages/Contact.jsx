@@ -49,7 +49,7 @@ export default function Contact() {
           <p className="section-subtitle">Become a MAKUMA retail partner. Fill the form below or contact us directly on WhatsApp.</p>
         </motion.div>
 
-        <div className="contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', marginTop: '60px' }}>
+        <div className="contact-grid responsive-grid-2" style={{ marginTop: '60px' }}>
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}

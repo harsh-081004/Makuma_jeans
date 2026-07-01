@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { authAPI } from '../../services/api';
+import { secureStorage } from '../../utils/storage';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -37,8 +38,15 @@ export default function AdminLogin() {
         res = await authAPI.login({ username: form.username, password: form.password });
       }
 
-      localStorage.setItem('makuma_token', res.data.token);
-      localStorage.setItem('makuma_admin', JSON.stringify(res.data.admin));
+      const token = res.data?.token || res.token;
+      const adminData = res.data?.admin || res.admin;
+
+      if (!token) {
+        throw new Error('Authentication failed: No token received');
+      }
+
+      secureStorage.setItem('makuma_token', token);
+      secureStorage.setItem('makuma_admin', adminData);
       navigate('/admin/dashboard');
     } catch (err) {
       setError(err.message || 'Authentication failed');

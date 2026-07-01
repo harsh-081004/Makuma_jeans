@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { productsAPI, categoriesAPI, inquiriesAPI, uploadAPI, settingsAPI, lookbookAPI } from '../../services/api';
+import { secureStorage } from '../../utils/storage';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [tab, setTab] = useState('products');
   const [products, setProducts] = useState([]);
   const [inquiries, setInquiries] = useState([]);
@@ -22,10 +24,10 @@ export default function AdminDashboard() {
   const [uploadingCategoryImage, setUploadingCategoryImage] = useState(false);
   const [uploadingLookbookImage, setUploadingLookbookImage] = useState(false);
 
-  const admin = JSON.parse(localStorage.getItem('makuma_admin') || '{}');
+  const admin = secureStorage.getItem('makuma_admin') || {};
 
   useEffect(() => {
-    const token = localStorage.getItem('makuma_token');
+    const token = secureStorage.getItem('makuma_token');
     if (!token) {
       navigate('/admin/login');
       return;
@@ -64,8 +66,8 @@ export default function AdminDashboard() {
   }
 
   function handleLogout() {
-    localStorage.removeItem('makuma_token');
-    localStorage.removeItem('makuma_admin');
+    secureStorage.removeItem('makuma_token');
+    secureStorage.removeItem('makuma_admin');
     navigate('/admin/login');
   }
 
@@ -87,7 +89,9 @@ export default function AdminDashboard() {
     setUploadingImage(true);
     try {
       const res = await uploadAPI.single(file);
-      setProductForm({ ...productForm, image: res.data.url, imagePublicId: res.data.publicId });
+      const url = res.imageUrl || res.data?.url || res.url;
+      const publicId = res.publicId || res.data?.publicId;
+      setProductForm({ ...productForm, image: url, imagePublicId: publicId });
     } catch (err) {
       setError('Image upload failed: ' + err.message);
     } finally {
@@ -174,7 +178,9 @@ export default function AdminDashboard() {
     setUploadingCategoryImage(true);
     try {
       const res = await uploadAPI.single(file);
-      setCategoryForm({ ...categoryForm, image: res.data.url, imagePublicId: res.data.publicId });
+      const url = res.imageUrl || res.data?.url || res.url;
+      const publicId = res.publicId || res.data?.publicId;
+      setCategoryForm({ ...categoryForm, image: url, imagePublicId: publicId });
     } catch (err) {
       setError('Category image upload failed: ' + err.message);
     } finally {
@@ -202,7 +208,9 @@ export default function AdminDashboard() {
     setUploadingLookbookImage(true);
     try {
       const res = await uploadAPI.single(file);
-      setLookbookForm({ ...lookbookForm, image: res.data.url, imagePublicId: res.data.publicId });
+      const url = res.imageUrl || res.data?.url || res.url;
+      const publicId = res.publicId || res.data?.publicId;
+      setLookbookForm({ ...lookbookForm, image: url, imagePublicId: publicId });
     } catch (err) {
       setError('Lookbook image upload failed: ' + err.message);
     } finally {
@@ -321,9 +329,12 @@ export default function AdminDashboard() {
             <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', marginBottom: '4px' }}>Admin Dashboard</h1>
             <p style={{ color: '#888' }}>Welcome, {admin.username || 'Admin'}</p>
           </div>
-          <button onClick={handleLogout} style={{ padding: '10px 24px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}>
-            Logout
-          </button>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <Link to="/" style={{ color: 'var(--accent)', textDecoration: 'underline', fontSize: '0.95rem' }}>View Live Site</Link>
+            <button onClick={handleLogout} style={{ padding: '10px 24px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}>
+              Logout
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -334,7 +345,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', marginBottom: '40px' }}>
+        <div className="dashboard-stats-grid">
           {[
             { label: 'Products', value: products.length, color: '#000' },
             { label: 'Categories', value: categories.length, color: 'var(--accent)' },
@@ -349,7 +360,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '30px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '30px' }}>
           {['products', 'inquiries', 'categories', 'lookbook', 'content'].map((t) => (
             <button key={t} onClick={() => setTab(t)} style={{ padding: '10px 24px', border: '1px solid #ddd', borderRadius: '4px', background: tab === t ? '#000' : '#fff', color: tab === t ? '#fff' : '#555', cursor: 'pointer', fontWeight: '500', textTransform: 'capitalize', transition: 'all 0.2s' }}>
               {t}
@@ -368,7 +379,7 @@ export default function AdminDashboard() {
             </div>
 
             {showAddProduct && (
-              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} onSubmit={handleAddProduct} style={{ background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid #eaeaea', marginBottom: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} onSubmit={handleAddProduct} className="dashboard-form-grid" style={{ background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid #eaeaea', marginBottom: '30px' }}>
                 <div><label style={labelStyle}>Product Name *</label><input name="name" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} required style={inputStyle} /></div>
                 
                 <div>
@@ -479,7 +490,7 @@ export default function AdminDashboard() {
             </div>
 
             {showAddCategory && (
-              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} onSubmit={handleAddCategory} style={{ background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid #eaeaea', marginBottom: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} onSubmit={handleAddCategory} className="dashboard-form-grid" style={{ background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid #eaeaea', marginBottom: '30px' }}>
                 <div><label style={labelStyle}>Category Name *</label><input name="name" value={categoryForm.name} onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })} required style={inputStyle} placeholder="e.g. Wide Leg Jeans" /></div>
                 <div><label style={labelStyle}>Slug *</label><input name="slug" value={categoryForm.slug} onChange={(e) => setCategoryForm({ ...categoryForm, slug: e.target.value })} required style={inputStyle} placeholder="e.g. wide-leg-jeans" /></div>
                 <div style={{ gridColumn: 'span 2' }}>
@@ -501,7 +512,7 @@ export default function AdminDashboard() {
               </motion.form>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
               {categories.map((cat) => (
                 <div key={cat._id} style={{ background: '#fff', padding: '20px', borderRadius: '8px', border: '1px solid #eaeaea' }}>
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
@@ -536,7 +547,7 @@ export default function AdminDashboard() {
             </div>
 
             {showAddLookbook && (
-              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} onSubmit={handleAddLookbook} style={{ background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid #eaeaea', marginBottom: '30px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} onSubmit={handleAddLookbook} className="dashboard-form-grid" style={{ background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid #eaeaea', marginBottom: '30px' }}>
                 <div><label style={labelStyle}>Title *</label><input value={lookbookForm.title} onChange={(e) => setLookbookForm({ ...lookbookForm, title: e.target.value })} required style={inputStyle} placeholder="e.g. Summer Denim Look" /></div>
                 <div><label style={labelStyle}>Category</label><input value={lookbookForm.category} onChange={(e) => setLookbookForm({ ...lookbookForm, category: e.target.value })} style={inputStyle} placeholder="e.g. Wide Leg Jeans" /></div>
                 <div style={{ gridColumn: 'span 2' }}>

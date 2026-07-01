@@ -14,7 +14,7 @@ export default function About() {
             <h2 className="section-title">Wholesale Denim Experts</h2>
           </motion.div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center', marginTop: '60px' }}>
+          <div className="responsive-grid-2" style={{ marginTop: '60px' }}>
             <motion.div 
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -50,7 +50,7 @@ export default function About() {
             </motion.div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center', marginTop: '100px', marginBottom: '40px' }}>
+          <div className="responsive-grid-2" style={{ marginTop: '100px', marginBottom: '40px' }}>
             <motion.div 
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}

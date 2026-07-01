@@ -75,7 +75,7 @@ export function Footer() {
   return (
     <footer className="footer" id="contact" style={{ background: '#0a0a0a', color: '#ffffff', paddingTop: '80px', paddingBottom: '40px', borderTop: '4px solid var(--accent)' }}>
       <div className="container">
-        <div className="footer-top" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1.5fr', gap: '40px', marginBottom: '60px' }}>
+        <div className="footer-top" style={{ marginBottom: '60px' }}>
           
           <div className="footer-brand">
             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem', color: 'var(--accent)', letterSpacing: '2px', marginBottom: '16px' }}>

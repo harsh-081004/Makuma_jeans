@@ -35,7 +35,7 @@ export default function Home() {
           style={{ position: 'absolute', bottom: '10%', right: '10%', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(150,150,150,0.1) 0%, rgba(255,255,255,0) 70%)', filter: 'blur(20px)', zIndex: 0 }}
         />
 
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+        <div className="container hero-container" style={{ position: 'relative', zIndex: 1 }}>
           
           <motion.div 
             className="hero-text"
@@ -59,7 +59,7 @@ export default function Home() {
               {settings?.heroDescription || 'Supply your boutique with our premium collection of wide-leg jeans, trousers, and palazzos. Exceptional quality at unbeatable wholesale pricing.'}
             </motion.p>
             
-            <motion.div variants={fadeInUp} style={{ display: 'flex', gap: '16px' }}>
+            <motion.div variants={fadeInUp} className="hero-actions" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
               <Link to="/collections" className="btn" style={{ background: '#000', color: '#fff', padding: '16px 36px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>
                 Shop Wholesale
               </Link>

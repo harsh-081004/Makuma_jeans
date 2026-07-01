@@ -508,8 +508,7 @@ h1, h2, h3, h4 {
 .product-image img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  background: #f9f9f9;
+  object-fit: cover;
   transition: transform 0.6s ease;
 }
 
@@ -1089,3 +1088,153 @@ h1, h2, h3, h4 {
   padding: 24px;
   box-sizing: border-box;
 }
+
+/* ── Mobile & Tablet Responsiveness Enhancements ── */
+@media (max-width: 900px) {
+  .amazon-layout-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .product-detail-buybox > div {
+    position: static !important;
+  }
+}
+
+@media (min-width: 901px) {
+  .amazon-layout-grid {
+    display: grid;
+    grid-template-columns: 4fr 5fr 3.5fr;
+    gap: 40px;
+    align-items: start;
+  }
+}
+
+@media (max-width: 600px) {
+  .section-title { font-size: 2rem; }
+  .hero-title { font-size: 2.2rem; }
+  .hero-stat-value { font-size: 1.5rem; }
+  .page-section { padding: 60px 0; }
+  
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+  .product-name { font-size: 0.95rem; }
+  .product-info { padding: 16px; }
+  
+  .categories-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* Footer Responsive Grid */
+.footer-top {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 40px;
+}
+@media (max-width: 900px) {
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+/* Responsive 2-Column Grid */
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+}
+@media (max-width: 900px) {
+  .responsive-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+/* Hamburger Menu Animation */
+.nav-toggle.active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+.nav-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Admin Dashboard Responsiveness */
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+.dashboard-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 900px) {
+  .dashboard-stats-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .dashboard-stats-grid { grid-template-columns: 1fr; }
+  .dashboard-form-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Extensive Global Breakpoints (Mobile S to 4K) ── */
+
+/* 4K and Ultra Wide (1920px+) */
+@media (min-width: 1920px) {
+  .container { max-width: 1800px; padding: 0 60px; }
+  .hero-title { font-size: clamp(4rem, 5vw, 6rem) !important; }
+  .section-title { font-size: 3rem !important; }
+  .product-name { font-size: 2.2rem !important; }
+  .amazon-layout-grid { gap: 60px; }
+  .products-grid { grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 50px; }
+}
+
+/* Laptop L (1440px to 1919px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .container { max-width: 1380px; }
+  .products-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; }
+}
+
+/* Laptop M (1024px to 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .amazon-layout-grid { gap: 30px; grid-template-columns: 4fr 5fr 3fr; }
+}
+
+/* Tablet Landscape / Small Laptop (901px to 1023px) */
+@media (min-width: 901px) and (max-width: 1023px) {
+  .amazon-layout-grid { gap: 20px; grid-template-columns: 1fr 1fr 1fr; }
+  .container { padding: 0 20px; }
+}
+
+/* Tablet Portrait (601px to 768px) */
+@media (min-width: 601px) and (max-width: 768px) {
+  .responsive-grid-2 { gap: 30px; }
+  .hero-title { font-size: 3.5rem !important; }
+}
+
+/* Mobile M/L (376px to 600px) */
+@media (min-width: 376px) and (max-width: 600px) {
+  .amazon-layout-grid { gap: 24px; }
+  .hero-title { font-size: 2.5rem !important; }
+}
+
+/* Mobile S (up to 375px) */
+@media (max-width: 375px) {
+  .container { padding: 0 16px; }
+  .amazon-layout-grid { gap: 20px; }
+  .hero-title { font-size: 2rem !important; }
+  .section-title { font-size: 1.8rem !important; }
+  .product-name { font-size: 1.1rem !important; }
+  .product-detail-buybox { padding: 16px !important; }
+  .products-grid { grid-template-columns: 1fr; }
+}
+

@@ -36,7 +36,7 @@ export default function Collections() {
 
   const filteredProducts = activeFilter === 'all' 
     ? products 
-    : products.filter(p => p.category === activeFilter);
+    : products.filter(p => (p.category?._id || p.category) === activeFilter);
 
   return (
     <section className="products page-section" style={{ paddingTop: '160px', minHeight: '100vh', flex: 1 }}>
@@ -90,7 +90,7 @@ export default function Collections() {
                   transition={{ duration: 0.3 }}
                   className="product-card wholesale-card"
                 >
-                  <div style={{ display: 'block' }}>
+                  <Link to={`/product/${product.id || product._id}`} style={{ display: 'block' }}>
                     <div className="product-image">
                       {product.image ? (
                         <img src={product.image} alt={product.name} loading="lazy" />
@@ -107,7 +107,7 @@ export default function Collections() {
                         </p>
                       )}
                     </div>
-                  </div>
+                  </Link>
                 </motion.div>
               ))}
             </AnimatePresence>

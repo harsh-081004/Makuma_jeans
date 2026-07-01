@@ -1,0 +1,19 @@
+{
+  "name": "makuma-worker",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev --port 8787",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "hono": "^4.12.27",
+    "mongoose": "^9.7.3"
+  },
+  "devDependencies": {
+    "wrangler": "^4.105.0"
+  }
+}

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { secureStorage } from '../utils/storage';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -11,7 +12,7 @@ const api = axios.create({
 
 // Add a request interceptor to inject the JWT token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('makuma_token');
+  const token = secureStorage.getItem('makuma_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -29,8 +30,8 @@ api.interceptors.response.use(
     
     // Handle 401 Unauthorized globally
     if (error.response.status === 401) {
-      localStorage.removeItem('makuma_token');
-      localStorage.removeItem('makuma_admin');
+      secureStorage.removeItem('makuma_token');
+      secureStorage.removeItem('makuma_admin');
       
       // Only redirect if not already on the login page to avoid loops
       if (window.location.pathname !== '/admin/login') {

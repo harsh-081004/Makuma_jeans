@@ -31,7 +31,7 @@ export default function Lookbook() {
         ) : items.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '100px 0', color: '#888' }}>Lookbook coming soon — stay tuned!</div>
         ) : (
-          <div className="lookbook-masonry" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px', gridAutoRows: '20px' }}>
+          <div className="lookbook-masonry" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '24px', gridAutoRows: '20px' }}>
             {items.map((item, i) => (
               <motion.div
                 key={item._id}

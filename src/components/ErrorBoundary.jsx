@@ -31,9 +31,9 @@ class ErrorBoundary extends React.Component {
           >
             Refresh Page
           </button>
-          <Link to="/" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
+          <a href="/" style={{ color: 'var(--accent)', textDecoration: 'underline' }}>
             Return to Home
-          </Link>
+          </a>
         </div>
       );
     }

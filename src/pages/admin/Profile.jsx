@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { authAPI } from '../../services/api';
+import { secureStorage } from '../../utils/storage';
 
 export default function AdminProfile() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ export default function AdminProfile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('makuma_token');
+    const token = secureStorage.getItem('makuma_token');
     if (!token) {
       navigate('/admin/login');
       return;
