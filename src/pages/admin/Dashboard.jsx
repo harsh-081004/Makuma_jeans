@@ -4,6 +4,21 @@ import { motion } from 'framer-motion';
 import { productsAPI, categoriesAPI, inquiriesAPI, uploadAPI, settingsAPI, lookbookAPI } from '../../services/api';
 import { secureStorage } from '../../utils/storage';
 
+function FormModal({ isOpen, onClose, title, children }) {
+  if (!isOpen) return null;
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ background: '#fff', padding: '30px', borderRadius: '12px', width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', position: 'relative', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid #eee', paddingBottom: '16px' }}>
+          <h2 style={{ fontSize: '1.5rem', margin: 0 }}>{title}</h2>
+          <button type="button" onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#888' }}>&times;</button>
+        </div>
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,6 +38,9 @@ export default function AdminDashboard() {
   const [uploadingHeroImage, setUploadingHeroImage] = useState(false);
   const [uploadingCategoryImage, setUploadingCategoryImage] = useState(false);
   const [uploadingLookbookImage, setUploadingLookbookImage] = useState(false);
+  const [savingProduct, setSavingProduct] = useState(false);
+  const [savingCategory, setSavingCategory] = useState(false);
+  const [savingLookbook, setSavingLookbook] = useState(false);
 
   const admin = secureStorage.getItem('makuma_admin') || {};
 
@@ -101,6 +119,7 @@ export default function AdminDashboard() {
 
   async function handleAddProduct(e) {
     e.preventDefault();
+    setSavingProduct(true);
     try {
       const data = {
         ...productForm,
@@ -121,6 +140,8 @@ export default function AdminDashboard() {
       loadData();
     } catch (err) {
       setError('Failed to save product: ' + err.message);
+    } finally {
+      setSavingProduct(false);
     }
   }
 
@@ -139,11 +160,11 @@ export default function AdminDashboard() {
     });
     setShowAddProduct(true);
     setTab('products');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function handleAddCategory(e) {
     e.preventDefault();
+    setSavingCategory(true);
     try {
       if (editingCategoryId) {
         await categoriesAPI.update(editingCategoryId, categoryForm);
@@ -156,6 +177,8 @@ export default function AdminDashboard() {
       loadData();
     } catch (err) {
       setError('Failed to save category: ' + err.message);
+    } finally {
+      setSavingCategory(false);
     }
   }
 
@@ -169,7 +192,6 @@ export default function AdminDashboard() {
     });
     setShowAddCategory(true);
     setTab('categories');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function handleCategoryImageUpload(e) {
@@ -220,6 +242,7 @@ export default function AdminDashboard() {
 
   async function handleAddLookbook(e) {
     e.preventDefault();
+    setSavingLookbook(true);
     try {
       await lookbookAPI.create(lookbookForm);
       setShowAddLookbook(false);
@@ -227,6 +250,8 @@ export default function AdminDashboard() {
       loadData();
     } catch (err) {
       setError('Failed to save lookbook item: ' + err.message);
+    } finally {
+      setSavingLookbook(false);
     }
   }
 
@@ -378,8 +403,12 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {showAddProduct && (
-              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} onSubmit={handleAddProduct} className="dashboard-form-grid" style={{ background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid #eaeaea', marginBottom: '30px' }}>
+            <FormModal 
+              isOpen={showAddProduct} 
+              onClose={() => { setShowAddProduct(false); setEditingProductId(null); }} 
+              title={editingProductId ? 'Edit Product' : 'Add New Product'}
+            >
+              <form onSubmit={handleAddProduct} className="dashboard-form-grid" style={{ marginBottom: '10px' }}>
                 <div><label style={labelStyle}>Product Name *</label><input name="name" value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} required style={inputStyle} /></div>
                 
                 <div>
@@ -419,15 +448,15 @@ export default function AdminDashboard() {
                 </div>
                 <div style={{ gridColumn: 'span 2' }}><label style={labelStyle}>Description</label><textarea name="description" value={productForm.description} onChange={(e) => setProductForm({ ...productForm, description: e.target.value })} rows="3" style={{ ...inputStyle, resize: 'vertical' }} /></div>
                 <div style={{ gridColumn: 'span 2' }}>
-                  <button type="submit" style={{ padding: '12px 32px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '1rem' }}>
-                    {editingProductId ? 'Update Product' : 'Save Product'}
+                  <button type="submit" disabled={savingProduct} style={{ padding: '12px 32px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: savingProduct ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '1rem' }}>
+                    {savingProduct ? 'Saving...' : (editingProductId ? 'Update Product' : 'Save Product')}
                   </button>
                   <button type="button" onClick={() => { setShowAddProduct(false); setEditingProductId(null); }} style={{ padding: '12px 32px', background: 'transparent', color: '#000', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '1rem', marginLeft: '12px' }}>
                     Cancel
                   </button>
                 </div>
-              </motion.form>
-            )}
+              </form>
+            </FormModal>
 
             <div style={{ display: 'grid', gap: '12px' }}>
               {products.map((p) => (
@@ -489,8 +518,12 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {showAddCategory && (
-              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} onSubmit={handleAddCategory} className="dashboard-form-grid" style={{ background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid #eaeaea', marginBottom: '30px' }}>
+            <FormModal
+              isOpen={showAddCategory}
+              onClose={() => { setShowAddCategory(false); setEditingCategoryId(null); }}
+              title={editingCategoryId ? 'Edit Category' : 'Add New Category'}
+            >
+              <form onSubmit={handleAddCategory} className="dashboard-form-grid" style={{ marginBottom: '10px' }}>
                 <div><label style={labelStyle}>Category Name *</label><input name="name" value={categoryForm.name} onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })} required style={inputStyle} placeholder="e.g. Wide Leg Jeans" /></div>
                 <div><label style={labelStyle}>Slug *</label><input name="slug" value={categoryForm.slug} onChange={(e) => setCategoryForm({ ...categoryForm, slug: e.target.value })} required style={inputStyle} placeholder="e.g. wide-leg-jeans" /></div>
                 <div style={{ gridColumn: 'span 2' }}>
@@ -502,15 +535,15 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <div style={{ gridColumn: 'span 2' }}>
-                  <button type="submit" style={{ padding: '12px 32px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '1rem' }}>
-                    {editingCategoryId ? 'Update Category' : 'Save Category'}
+                  <button type="submit" disabled={savingCategory} style={{ padding: '12px 32px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: savingCategory ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '1rem' }}>
+                    {savingCategory ? 'Saving...' : (editingCategoryId ? 'Update Category' : 'Save Category')}
                   </button>
                   <button type="button" onClick={() => { setShowAddCategory(false); setEditingCategoryId(null); }} style={{ padding: '12px 32px', background: 'transparent', color: '#000', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '1rem', marginLeft: '12px' }}>
                     Cancel
                   </button>
                 </div>
-              </motion.form>
-            )}
+              </form>
+            </FormModal>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
               {categories.map((cat) => (
@@ -546,8 +579,12 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {showAddLookbook && (
-              <motion.form initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} onSubmit={handleAddLookbook} className="dashboard-form-grid" style={{ background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid #eaeaea', marginBottom: '30px' }}>
+            <FormModal
+              isOpen={showAddLookbook}
+              onClose={() => setShowAddLookbook(false)}
+              title="Add New Lookbook Image"
+            >
+              <form onSubmit={handleAddLookbook} className="dashboard-form-grid" style={{ marginBottom: '10px' }}>
                 <div><label style={labelStyle}>Title *</label><input value={lookbookForm.title} onChange={(e) => setLookbookForm({ ...lookbookForm, title: e.target.value })} required style={inputStyle} placeholder="e.g. Summer Denim Look" /></div>
                 <div><label style={labelStyle}>Category</label><input value={lookbookForm.category} onChange={(e) => setLookbookForm({ ...lookbookForm, category: e.target.value })} style={inputStyle} placeholder="e.g. Wide Leg Jeans" /></div>
                 <div style={{ gridColumn: 'span 2' }}>
@@ -559,15 +596,15 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <div style={{ gridColumn: 'span 2' }}>
-                  <button type="submit" disabled={!lookbookForm.image} style={{ padding: '12px 32px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: lookbookForm.image ? 'pointer' : 'not-allowed', fontWeight: '600', fontSize: '1rem' }}>
-                    Save Lookbook Image
+                  <button type="submit" disabled={!lookbookForm.image || savingLookbook} style={{ padding: '12px 32px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: (!lookbookForm.image || savingLookbook) ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '1rem' }}>
+                    {savingLookbook ? 'Saving...' : 'Save Lookbook Image'}
                   </button>
                   <button type="button" onClick={() => setShowAddLookbook(false)} style={{ padding: '12px 32px', background: 'transparent', color: '#000', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '1rem', marginLeft: '12px' }}>
                     Cancel
                   </button>
                 </div>
-              </motion.form>
-            )}
+              </form>
+            </FormModal>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
               {lookbookItems.map((item) => (
@@ -614,7 +651,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <button type="submit" disabled={savingSettings} style={{ padding: '12px 32px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: savingSettings ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '1rem' }}>
-                  {savingSettings ? 'Saving...' : 'Save Content'}
+                  {savingSettings ? 'Saving...' : 'Update Settings'}
                 </button>
               </div>
             </form>

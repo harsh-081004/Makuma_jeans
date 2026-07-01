@@ -73,5 +73,17 @@ app.route('/api/lookbook', lookbookRoutes);
 app.all('/api/*', (c) => {
   return c.json({ success: false, message: `Route ${c.req.path} not found.` }, 404);
 });
+// ─── Global Error Handler ───
+app.onError((err, c) => {
+  console.error(`[Global Error]`, err);
+  
+  // Safely fallback to a generic message to prevent exposing secrets
+  // Cloudflare Workers will sometimes expose the entire env object or connection strings
+  // if you directly return the error to the client.
+  return c.json({
+    success: false,
+    message: 'An unexpected internal server error occurred.'
+  }, 500);
+});
 
 export default app;

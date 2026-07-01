@@ -1,4 +1,4 @@
-export const uploadImageToCloudinary = async (fileBuffer, fileName, env) => {
+export const uploadImageToCloudinary = async (file, env) => {
   const timestamp = Math.round(new Date().getTime() / 1000);
   const signatureString = `folder=makuma-products&timestamp=${timestamp}${env.CLOUDINARY_API_SECRET}`;
   
@@ -9,7 +9,7 @@ export const uploadImageToCloudinary = async (fileBuffer, fileName, env) => {
   const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
   const formData = new FormData();
-  formData.append('file', new Blob([fileBuffer]), fileName);
+  formData.append('file', file);
   formData.append('api_key', env.CLOUDINARY_API_KEY);
   formData.append('timestamp', timestamp.toString());
   formData.append('signature', signature);

@@ -14,9 +14,7 @@ upload.post('/', protect, async (c) => {
       return c.json({ success: false, message: 'Please upload an image' }, 400);
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    
-    const result = await uploadImageToCloudinary(arrayBuffer, file.name, c.env);
+    const result = await uploadImageToCloudinary(file, c.env);
 
     return c.json({
       success: true,
