@@ -57,13 +57,14 @@ function registerSchemas(conn) {
   conn.model('Category', catSchema);
 
   conn.model('Inquiry', new Schema({
-    businessName: { type: String, required: true },
-    contactPerson: { type: String, required: true },
-    email: { type: String, required: true },
+    name: { type: String, required: true },
+    business: { type: String, required: true },
+    email: { type: String, default: '' },
     phone: { type: String, required: true },
-    city: { type: String, default: '' },
+    interest: { type: String, default: '' },
+    volume: { type: String, default: '' },
     message: { type: String, default: '' },
-    status: { type: String, enum: ['new', 'contacted', 'converted', 'closed'], default: 'new' },
+    status: { type: String, enum: ['new', 'contacted', 'qualified', 'converted', 'closed'], default: 'new' },
   }, { timestamps: true }));
 
   conn.model('Setting', new Schema({
