@@ -83,49 +83,30 @@ function registerSchemas(conn) {
   }, { timestamps: true }));
 }
 
-let cachedConn = null;
-
-// Reuses the connection across requests to dramatically improve performance
+// Creates a NEW connection for each request (required by CF Workers)
 export async function connectDB(mongoUri) {
-  if (cachedConn && cachedConn.readyState === 1) {
-    return {
-      conn: cachedConn,
-      Admin: cachedConn.models.Admin,
-      Product: cachedConn.models.Product,
-      Category: cachedConn.models.Category,
-      Inquiry: cachedConn.models.Inquiry,
-      Setting: cachedConn.models.Setting,
-      Lookbook: cachedConn.models.Lookbook,
-    };
-  }
-
   const mongoose = await ensureMongoose();
 
-  // if a connection is already initializing, we don't want to create multiple
-  if (mongoose.connection && mongoose.connection.readyState === 1) {
-     cachedConn = mongoose.connection;
-  } else {
-     const conn = mongoose.createConnection(mongoUri, {
-       bufferCommands: false,
-       maxPoolSize: 10,
-       minPoolSize: 1,
-       serverSelectionTimeoutMS: 5000,
-       socketTimeoutMS: 45000,
-     });
-     conn.setMaxListeners(50);
-     await conn.asPromise();
-     cachedConn = conn;
-  }
+  const conn = mongoose.createConnection(mongoUri, {
+    bufferCommands: false,
+    maxPoolSize: 1,
+    minPoolSize: 0,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 15000,
+  });
 
-  registerSchemas(cachedConn);
+  conn.setMaxListeners(50);
+  await conn.asPromise();
+
+  registerSchemas(conn);
 
   return {
-    conn: cachedConn,
-    Admin: cachedConn.models.Admin,
-    Product: cachedConn.models.Product,
-    Category: cachedConn.models.Category,
-    Inquiry: cachedConn.models.Inquiry,
-    Setting: cachedConn.models.Setting,
-    Lookbook: cachedConn.models.Lookbook,
+    conn, // Return connection so we can close it
+    Admin: conn.models.Admin,
+    Product: conn.models.Product,
+    Category: conn.models.Category,
+    Inquiry: conn.models.Inquiry,
+    Setting: conn.models.Setting,
+    Lookbook: conn.models.Lookbook,
   };
 }
