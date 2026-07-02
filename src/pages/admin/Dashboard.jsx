@@ -50,11 +50,11 @@ export default function AdminDashboard() {
       navigate('/admin/login');
       return;
     }
-    loadData();
+    loadData(true);
   }, []);
 
-  async function loadData() {
-    setLoading(true);
+  async function loadData(showLoader = false) {
+    if (showLoader) setLoading(true);
     try {
       const [prodRes, catRes, inqRes, setRes, lbRes] = await Promise.all([
         productsAPI.list(),
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      if (showLoader) setLoading(false);
     }
   }
 
@@ -137,7 +137,7 @@ export default function AdminDashboard() {
       setShowAddProduct(false);
       setEditingProductId(null);
       setProductForm({ name: '', category: '', categoryLabel: '', image: '', imagePublicId: '', badge: '', sizes: '', availableColors: '', description: '' });
-      loadData();
+      loadData(false);
     } catch (err) {
       setError('Failed to save product: ' + err.message);
     } finally {
@@ -174,7 +174,7 @@ export default function AdminDashboard() {
       setShowAddCategory(false);
       setEditingCategoryId(null);
       setCategoryForm({ name: '', slug: '', image: '', imagePublicId: '' });
-      loadData();
+      loadData(false);
     } catch (err) {
       setError('Failed to save category: ' + err.message);
     } finally {
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
       await lookbookAPI.create(lookbookForm);
       setShowAddLookbook(false);
       setLookbookForm({ title: '', image: '', imagePublicId: '', category: '' });
-      loadData();
+      loadData(false);
     } catch (err) {
       setError('Failed to save lookbook item: ' + err.message);
     } finally {
@@ -267,7 +267,7 @@ export default function AdminDashboard() {
   async function handleDeleteLookbook(id) {
     try {
       await lookbookAPI.delete(id);
-      loadData();
+      loadData(false);
     } catch (err) {
       setError(err.message);
     }
@@ -296,7 +296,7 @@ export default function AdminDashboard() {
   async function handleDeleteProduct(id) {
     try {
       await productsAPI.delete(id);
-      loadData();
+      loadData(false);
     } catch (err) {
       setError(err.message);
     }
@@ -305,7 +305,7 @@ export default function AdminDashboard() {
   async function handleDeleteCategory(id) {
     try {
       await categoriesAPI.delete(id);
-      loadData();
+      loadData(false);
     } catch (err) {
       setError(err.message);
     }
@@ -314,7 +314,7 @@ export default function AdminDashboard() {
   async function handleUpdateInquiryStatus(id, status) {
     try {
       await inquiriesAPI.updateStatus(id, status);
-      loadData();
+      loadData(false);
     } catch (err) {
       setError(err.message);
     }
