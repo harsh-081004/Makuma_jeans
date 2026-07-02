@@ -42,13 +42,7 @@ app.use('/api/*', async (c, next) => {
   const db = await connectDB(c.env.MONGODB_URI);
   c.set('db', db);
 
-  try {
-    await next();
-  } finally {
-    if (db && db.conn && db.conn.readyState !== 0) {
-      try { await db.conn.close(); } catch(e) { /* ignore */ }
-    }
-  }
+  await next();
 });
 
 // ─── Health Check ───
