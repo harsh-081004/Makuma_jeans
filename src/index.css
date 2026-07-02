@@ -606,9 +606,99 @@ h1, h2, h3, h4 {
   border-color: var(--text-primary);
 }
 
-/* ── Lookbook Masonry ── */
-.lookbook-masonry-item:hover .lookbook-overlay {
-  opacity: 1 !important;
+/* ── Trendy Lookbook Masonry ── */
+.lookbook-masonry {
+  column-count: 3;
+  column-gap: 24px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .lookbook-masonry { column-count: 2; }
+}
+
+@media (max-width: 600px) {
+  .lookbook-masonry { column-count: 1; }
+}
+
+.lookbook-item {
+  break-inside: avoid;
+  margin-bottom: 24px;
+  cursor: pointer;
+}
+
+.lookbook-image-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #f4f4f4;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+}
+
+.lookbook-item:hover .lookbook-image-wrapper {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+.lookbook-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.lookbook-item:hover .lookbook-image {
+  transform: scale(1.05);
+}
+
+.lookbook-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 30px;
+}
+
+.lookbook-item:hover .lookbook-overlay {
+  opacity: 1;
+}
+
+.lookbook-content {
+  transform: translateY(20px);
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.lookbook-item:hover .lookbook-content {
+  transform: translateY(0);
+}
+
+.lookbook-category {
+  display: inline-block;
+  color: #fff;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.lookbook-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: white;
+  margin: 0;
+  font-family: var(--font-heading);
 }
 
 /* ── Footer ── */
