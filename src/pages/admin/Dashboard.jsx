@@ -41,6 +41,14 @@ export default function AdminDashboard() {
   const [savingProduct, setSavingProduct] = useState(false);
   const [savingCategory, setSavingCategory] = useState(false);
   const [savingLookbook, setSavingLookbook] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [processingId, setProcessingId] = useState(null);
+  const [showEditSettings, setShowEditSettings] = useState(false);
+
+  function showToast(msg) {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), 3000);
+  }
 
   const admin = secureStorage.getItem('makuma_admin') || {};
 
@@ -138,6 +146,7 @@ export default function AdminDashboard() {
       setEditingProductId(null);
       setProductForm({ name: '', category: '', categoryLabel: '', image: '', imagePublicId: '', badge: '', sizes: '', availableColors: '', description: '' });
       loadData(false);
+      showToast(editingProductId ? 'Product updated successfully!' : 'Product added successfully!');
     } catch (err) {
       setError('Failed to save product: ' + err.message);
     } finally {
@@ -175,6 +184,7 @@ export default function AdminDashboard() {
       setEditingCategoryId(null);
       setCategoryForm({ name: '', slug: '', image: '', imagePublicId: '' });
       loadData(false);
+      showToast(editingCategoryId ? 'Category updated successfully!' : 'Category added successfully!');
     } catch (err) {
       setError('Failed to save category: ' + err.message);
     } finally {
@@ -248,6 +258,7 @@ export default function AdminDashboard() {
       setShowAddLookbook(false);
       setLookbookForm({ title: '', image: '', imagePublicId: '', category: '' });
       loadData(false);
+      showToast('Lookbook image added successfully!');
     } catch (err) {
       setError('Failed to save lookbook item: ' + err.message);
     } finally {
@@ -265,11 +276,15 @@ export default function AdminDashboard() {
   }
 
   async function handleDeleteLookbook(id) {
+    setProcessingId(id);
     try {
       await lookbookAPI.delete(id);
       loadData(false);
+      showToast('Lookbook item deleted successfully!');
     } catch (err) {
       setError(err.message);
+    } finally {
+      setProcessingId(null);
     }
   }
 
@@ -294,29 +309,41 @@ export default function AdminDashboard() {
   }
 
   async function handleDeleteProduct(id) {
+    setProcessingId(id);
     try {
       await productsAPI.delete(id);
       loadData(false);
+      showToast('Product deleted successfully!');
     } catch (err) {
       setError(err.message);
+    } finally {
+      setProcessingId(null);
     }
   }
 
   async function handleDeleteCategory(id) {
+    setProcessingId(id);
     try {
       await categoriesAPI.delete(id);
       loadData(false);
+      showToast('Category deleted successfully!');
     } catch (err) {
       setError(err.message);
+    } finally {
+      setProcessingId(null);
     }
   }
 
   async function handleUpdateInquiryStatus(id, status) {
+    setProcessingId(id);
     try {
       await inquiriesAPI.updateStatus(id, status);
       loadData(false);
+      showToast('Status updated successfully!');
     } catch (err) {
       setError(err.message);
+    } finally {
+      setProcessingId(null);
     }
   }
 
@@ -326,7 +353,8 @@ export default function AdminDashboard() {
     try {
       await settingsAPI.update(settingsForm);
       setError('');
-      alert('Settings saved successfully!');
+      setShowEditSettings(false);
+      showToast('Settings saved successfully!');
     } catch (err) {
       setError('Failed to save settings: ' + err.message);
     } finally {
@@ -346,7 +374,17 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div style={{ paddingTop: '100px', minHeight: '100vh', background: '#f9f9f9' }}>
+    <div style={{ paddingTop: '100px', minHeight: '100vh', background: '#f9f9f9', position: 'relative' }}>
+      
+      {/* Toast Notification */}
+      <motion.div 
+        initial={{ opacity: 0, y: -50 }} 
+        animate={{ opacity: toastMessage ? 1 : 0, y: toastMessage ? 0 : -50 }}
+        style={{ position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', background: '#000', color: '#fff', padding: '12px 24px', borderRadius: '30px', zIndex: 9999, fontWeight: '500', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', pointerEvents: toastMessage ? 'auto' : 'none' }}
+      >
+        {toastMessage}
+      </motion.div>
+
       <div className="container">
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
@@ -476,7 +514,9 @@ export default function AdminDashboard() {
                   <div className="item-actions">
                     {p.badge && <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '600', background: p.badge === 'trending' ? 'var(--accent)' : '#000', color: '#fff', textTransform: 'uppercase', marginRight: '8px' }}>{p.badge}</span>}
                     <button onClick={() => handleEditProduct(p)} style={{ padding: '6px 14px', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem', marginRight: '8px' }}>Edit</button>
-                    <button onClick={() => requestDeleteProduct(p._id)} style={{ padding: '6px 14px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>Delete</button>
+                    <button onClick={() => requestDeleteProduct(p._id)} disabled={processingId === p._id} style={{ padding: '6px 14px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: processingId === p._id ? 'not-allowed' : 'pointer', fontSize: '0.85rem', opacity: processingId === p._id ? 0.7 : 1 }}>
+                      {processingId === p._id ? 'Deleting...' : 'Delete'}
+                    </button>
                   </div>
                 </div>
               ))}
@@ -560,8 +600,10 @@ export default function AdminDashboard() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ fontSize: '0.85rem', color: 'var(--accent)', fontWeight: '500' }}>{cat.productCount || 0} products</div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      <button onClick={() => handleEditCategory(cat)} style={{ padding: '4px 10px', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Edit</button>
-                      <button onClick={() => requestDeleteCategory(cat._id)} style={{ padding: '4px 10px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}>Delete</button>
+                      <button onClick={() => handleEditCategory(cat)} style={{ padding: '6px 14px', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>Edit</button>
+                      <button onClick={() => requestDeleteCategory(cat._id)} disabled={processingId === cat._id} style={{ padding: '6px 14px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: processingId === cat._id ? 'not-allowed' : 'pointer', fontSize: '0.85rem', opacity: processingId === cat._id ? 0.7 : 1 }}>
+                        {processingId === cat._id ? 'Deleting...' : 'Delete'}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -616,7 +658,9 @@ export default function AdminDashboard() {
                     <div style={{ fontWeight: '600', fontSize: '0.9rem', marginBottom: '4px' }}>{item.title}</div>
                     {item.category && <div style={{ fontSize: '0.8rem', color: '#888' }}>{item.category}</div>}
                   </div>
-                  <button onClick={() => requestDeleteLookbook(item._id)} style={{ position: 'absolute', top: '8px', right: '8px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '50%', width: '28px', height: '28px', cursor: 'pointer', fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                  <button onClick={() => requestDeleteLookbook(item._id)} disabled={processingId === item._id} style={{ position: 'absolute', top: '10px', right: '10px', background: '#ff4d4f', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: processingId === item._id ? 'not-allowed' : 'pointer', fontSize: '0.8rem', opacity: processingId === item._id ? 0.7 : 1 }}>
+                    {processingId === item._id ? '...' : 'Delete'}
+                  </button>
                 </div>
               ))}
               {lookbookItems.length === 0 && <p style={{ color: '#888', textAlign: 'center', padding: '40px', gridColumn: '1 / -1' }}>No lookbook images yet. Add your first one above.</p>}
@@ -627,36 +671,70 @@ export default function AdminDashboard() {
         {/* Content Tab */}
         {tab === 'content' && (
           <div>
-            <h2 style={{ fontSize: '1.3rem', marginBottom: '20px' }}>Website Content</h2>
-            <form onSubmit={handleSaveSettings} style={{ background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid #eaeaea', display: 'grid', gap: '20px', maxWidth: '800px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px' }}>
+              <h2 style={{ fontSize: '1.3rem', margin: 0 }}>Website Content</h2>
+              <button onClick={() => setShowEditSettings(true)} style={{ padding: '8px 20px', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600' }}>
+                + Edit Settings
+              </button>
+            </div>
+
+            <div style={{ background: '#fff', padding: '24px', borderRadius: '8px', border: '1px solid #eaeaea', display: 'grid', gap: '16px' }}>
               <div>
-                <label style={labelStyle}>Hero Title</label>
-                <input name="heroTitle" value={settingsForm.heroTitle} onChange={(e) => setSettingsForm({ ...settingsForm, heroTitle: e.target.value })} style={inputStyle} placeholder="e.g. Redefining Ladies Denim" />
-                <small style={{ color: '#888', fontSize: '0.8rem' }}>Use \n for new lines</small>
+                <strong style={{ color: '#555', fontSize: '0.85rem', textTransform: 'uppercase' }}>Hero Title</strong>
+                <div style={{ fontSize: '1.1rem', marginTop: '4px' }}>{settingsForm.heroTitle || 'Not set'}</div>
               </div>
               <div>
-                <label style={labelStyle}>Hero Subtitle</label>
-                <input name="heroSubtitle" value={settingsForm.heroSubtitle} onChange={(e) => setSettingsForm({ ...settingsForm, heroSubtitle: e.target.value })} style={inputStyle} placeholder="e.g. Surat's Premium Wholesaler" />
+                <strong style={{ color: '#555', fontSize: '0.85rem', textTransform: 'uppercase' }}>Hero Subtitle</strong>
+                <div style={{ fontSize: '1rem', marginTop: '4px', color: '#333' }}>{settingsForm.heroSubtitle || 'Not set'}</div>
               </div>
-              <div>
-                <label style={labelStyle}>Hero Description</label>
-                <textarea name="heroDescription" value={settingsForm.heroDescription} onChange={(e) => setSettingsForm({ ...settingsForm, heroDescription: e.target.value })} style={{ ...inputStyle, resize: 'vertical', minHeight: '100px' }} />
-              </div>
-              <div>
-                <label style={labelStyle}>Hero Image</label>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  <input type="file" accept="image/*" onChange={handleHeroImageUpload} style={{ fontSize: '0.9rem' }} />
-                  {uploadingHeroImage && <span style={{ color: 'var(--accent)', fontSize: '0.85rem' }}>Uploading...</span>}
-                  {settingsForm.heroImage && <img src={settingsForm.heroImage} alt="Hero Preview" style={{ width: '120px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }} />}
+              {settingsForm.heroImage && (
+                <div>
+                  <strong style={{ color: '#555', fontSize: '0.85rem', textTransform: 'uppercase' }}>Hero Image</strong>
+                  <div style={{ marginTop: '8px' }}>
+                    <img src={settingsForm.heroImage} alt="Hero" style={{ width: '200px', borderRadius: '8px', border: '1px solid #eaeaea' }} />
+                  </div>
                 </div>
-                <small style={{ color: '#888', fontSize: '0.8rem' }}>Upload the main hero section image</small>
-              </div>
-              <div>
-                <button type="submit" disabled={savingSettings} style={{ padding: '12px 32px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: savingSettings ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '1rem' }}>
-                  {savingSettings ? 'Saving...' : 'Update Settings'}
-                </button>
-              </div>
-            </form>
+              )}
+            </div>
+
+            <FormModal
+              isOpen={showEditSettings}
+              onClose={() => setShowEditSettings(false)}
+              title="Edit Website Content"
+            >
+              <form onSubmit={handleSaveSettings} style={{ display: 'grid', gap: '20px' }}>
+                <div>
+                  <label style={labelStyle}>Hero Title</label>
+                  <input name="heroTitle" value={settingsForm.heroTitle} onChange={(e) => setSettingsForm({ ...settingsForm, heroTitle: e.target.value })} style={inputStyle} placeholder="e.g. Redefining Ladies Denim" />
+                  <small style={{ color: '#888', fontSize: '0.8rem' }}>Use \n for new lines</small>
+                </div>
+                <div>
+                  <label style={labelStyle}>Hero Subtitle</label>
+                  <input name="heroSubtitle" value={settingsForm.heroSubtitle} onChange={(e) => setSettingsForm({ ...settingsForm, heroSubtitle: e.target.value })} style={inputStyle} placeholder="e.g. Surat's Premium Wholesaler" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Hero Description</label>
+                  <textarea name="heroDescription" value={settingsForm.heroDescription} onChange={(e) => setSettingsForm({ ...settingsForm, heroDescription: e.target.value })} style={{ ...inputStyle, resize: 'vertical', minHeight: '100px' }} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Hero Image</label>
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                    <input type="file" accept="image/*" onChange={handleHeroImageUpload} style={{ fontSize: '0.9rem' }} />
+                    {uploadingHeroImage && <span style={{ color: 'var(--accent)', fontSize: '0.85rem' }}>Uploading...</span>}
+                    {settingsForm.heroImage && <img src={settingsForm.heroImage} alt="Hero Preview" style={{ width: '120px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }} />}
+                  </div>
+                  <small style={{ color: '#888', fontSize: '0.8rem' }}>Upload the main hero section image</small>
+                </div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button type="submit" disabled={savingSettings} style={{ padding: '12px 32px', background: '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: savingSettings ? 'not-allowed' : 'pointer', fontWeight: '600', fontSize: '1rem' }}>
+                    {savingSettings ? 'Saving...' : 'Update Settings'}
+                  </button>
+                  <button type="button" onClick={() => setShowEditSettings(false)} style={{ padding: '12px 32px', background: 'transparent', color: '#000', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', fontSize: '1rem' }}>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </FormModal>
           </div>
         )}
       </div>
