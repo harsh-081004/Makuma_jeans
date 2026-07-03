@@ -1157,8 +1157,10 @@ h1, h2, h3, h4 {
   .nav-links.active { right: 0; }
   .nav-toggle { display: flex; }
   
+  .footer { padding-bottom: 120px; }
   .footer-top { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+  .footer-bottom-links { justify-content: center; flex-wrap: wrap; }
 }
 
 
@@ -1274,6 +1276,32 @@ h1, h2, h3, h4 {
 @media (max-width: 600px) {
   .dashboard-stats-grid { grid-template-columns: 1fr; }
   .dashboard-form-grid { grid-template-columns: 1fr; }
+}
+
+.dashboard-list-item {
+  background: #fff;
+  padding: 16px 20px;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.dashboard-list-item .item-actions {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .dashboard-list-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .dashboard-list-item .item-actions {
+    width: 100%;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
 }
 
 /* ── Extensive Global Breakpoints (Mobile S to 4K) ── */

@@ -460,9 +460,9 @@ export default function AdminDashboard() {
 
             <div style={{ display: 'grid', gap: '12px' }}>
               {products.map((p) => (
-                <div key={p._id || p.id} style={{ background: '#fff', padding: '16px 20px', borderRadius: '8px', border: '1px solid #eaeaea', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div key={p._id || p.id} className="dashboard-list-item">
                   {p.image && <img src={p.image} alt={p.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />}
-                  <div style={{ flex: 1 }}>
+                  <div className="item-content" style={{ flex: 1 }}>
                     <div style={{ fontWeight: '600' }}>{p.name}</div>
                     <div style={{ fontSize: '0.85rem', color: '#888' }}>
                       {p.categoryLabel}
@@ -473,9 +473,11 @@ export default function AdminDashboard() {
                       )}
                     </div>
                   </div>
-                  {p.badge && <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '600', background: p.badge === 'trending' ? 'var(--accent)' : '#000', color: '#fff', textTransform: 'uppercase' }}>{p.badge}</span>}
-                  <button onClick={() => handleEditProduct(p)} style={{ padding: '6px 14px', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>Edit</button>
-                  <button onClick={() => requestDeleteProduct(p._id)} style={{ padding: '6px 14px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>Delete</button>
+                  <div className="item-actions">
+                    {p.badge && <span style={{ padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '600', background: p.badge === 'trending' ? 'var(--accent)' : '#000', color: '#fff', textTransform: 'uppercase', marginRight: '8px' }}>{p.badge}</span>}
+                    <button onClick={() => handleEditProduct(p)} style={{ padding: '6px 14px', background: '#f0f0f0', color: '#333', border: '1px solid #ddd', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem', marginRight: '8px' }}>Edit</button>
+                    <button onClick={() => requestDeleteProduct(p._id)} style={{ padding: '6px 14px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.85rem' }}>Delete</button>
+                  </div>
                 </div>
               ))}
               {products.length === 0 && <p style={{ color: '#888', textAlign: 'center', padding: '40px' }}>No products yet. Add your first product above.</p>}

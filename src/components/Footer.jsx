@@ -85,7 +85,7 @@ export function Footer() {
               {BRAND.tagline} Premium ladies bottoms crafted in Surat, delivered securely across India.
             </p>
             <div className="footer-socials" style={{ display: 'flex', gap: '16px' }}>
-              <a className="footer-social" href="#" title="Facebook" style={{ color: 'var(--bg-primary)', background: 'var(--text-primary)', padding: '10px', borderRadius: '50%', display: 'flex', border: '1px solid var(--border)' }}>FB</a>
+              <a className="footer-social" href="https://www.instagram.com/makuma_jeans_wold?utm_source=qr" title="Instagram" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--bg-primary)', background: 'var(--text-primary)', padding: '10px', borderRadius: '50%', display: 'flex', border: '1px solid var(--border)' }}>IG</a>
               <a className="footer-social" href={BRAND.whatsappLink} title="WhatsApp" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--bg-primary)', background: 'var(--text-primary)', padding: '10px', borderRadius: '50%', display: 'flex', border: '1px solid var(--border)' }}>WA</a>
             </div>
           </div>
@@ -125,9 +125,9 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="footer-bottom" style={{ borderTop: '1px solid #222', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', color: '#777', fontSize: '0.9rem' }}>
+        <div className="footer-bottom" style={{ borderTop: '1px solid #222', paddingTop: '24px', color: '#777', fontSize: '0.9rem' }}>
           <p>&copy; {new Date().getFullYear()} {BRAND.name}. All B2B rights reserved.</p>
-          <div className="footer-bottom-links" style={{ display: 'flex', gap: '24px' }}>
+          <div className="footer-bottom-links">
             <a href="/admin/login" style={{ transition: 'color 0.3s' }} onMouseOver={e => e.target.style.color = 'white'} onMouseOut={e => e.target.style.color = '#777'}>Admin Portal</a>
             <a href="#" style={{ transition: 'color 0.3s' }} onMouseOver={e => e.target.style.color = 'white'} onMouseOut={e => e.target.style.color = '#777'}>Privacy Policy</a>
             <a href="#" style={{ transition: 'color 0.3s' }} onMouseOver={e => e.target.style.color = 'white'} onMouseOut={e => e.target.style.color = '#777'}>Terms & Conditions</a>
